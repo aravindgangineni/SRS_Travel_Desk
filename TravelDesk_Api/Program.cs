@@ -16,14 +16,17 @@ builder.Services.AddCors(options =>
         policyBuilder =>
         {
             policyBuilder.WithOrigins("http://localhost:4200")
-                         .AllowAnyHeader()
-                         .AllowAnyMethod();
+                        .AllowAnyHeader()
+                        .AllowAnyMethod();
         });
 });
 
 // Configure DbContext with SQL Server
 builder.Services.AddDbContext<TravelDeskContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Register the EmailService for dependency injection
+builder.Services.AddScoped<EmailService>();
 
 // Configure JWT Authentication
 var jwtSettings = builder.Configuration.GetSection("Jwt");

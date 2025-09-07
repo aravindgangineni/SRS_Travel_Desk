@@ -134,7 +134,8 @@ namespace TravelDesk_Api.Controllers
             {
                 return NotFound();
             }
-            _context.Users.Remove(userToDelete);
+            // Perform a soft delete by setting the flag
+            userToDelete.IsDeleted = true;
             await _context.SaveChangesAsync();
             return NoContent();
         }

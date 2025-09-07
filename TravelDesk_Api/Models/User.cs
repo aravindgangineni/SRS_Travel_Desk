@@ -5,7 +5,6 @@ namespace TravelDesk_Api.Models
 {
     public class User
     {
-
         [Key]
         public int UserId { get; set; }
 
@@ -33,5 +32,8 @@ namespace TravelDesk_Api.Models
         public User? Manager { get; set; }
 
         public ICollection<User>? Subordinates { get; set; }
+
+        // Soft delete flag
+        public bool IsDeleted { get; set; } = false;
     }
 }

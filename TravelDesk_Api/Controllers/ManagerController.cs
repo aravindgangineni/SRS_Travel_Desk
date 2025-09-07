@@ -6,16 +6,25 @@ using System.Linq;
 
 namespace TravelDesk_Api.Controllers
 {
+    // A Data Transfer Object to handle incoming manager actions
+    public class ManagerActionDto
+    {
+        public string Action { get; set; }
+        public string Comments { get; set; }
+    }
+
     [Route("api/[controller]")]
     [ApiController]
     [Authorize(Roles = "Manager")]
     public class ManagerController : ControllerBase
     {
         private readonly TravelDeskContext _context;
+        private readonly EmailService _emailService;
 
-        public ManagerController(TravelDeskContext context)
+        public ManagerController(TravelDeskContext context, EmailService emailService)
         {
             _context = context;
+            _emailService = emailService;
         }
 
         // View assigned requests
@@ -52,7 +61,6 @@ namespace TravelDesk_Api.Controllers
                 return NotFound("Request not found or not assigned to this manager.");
             }
 
-            // A comment is required for every action
             if (string.IsNullOrEmpty(actionDto.Comments))
             {
                 return BadRequest("The comments section cannot be left blank.");
@@ -71,7 +79,18 @@ namespace TravelDesk_Api.Controllers
             {
                 case "approve":
                     request.Status = "Approved";
-                    // Note: An email notification to HR Travel Admin should be triggered here
+
+                    // Get the manager's details from the database
+                    var manager = await _context.Users.FindAsync(managerId);
+
+                    // Get HR email and send notification
+                    var hrAdmin = await _context.Users.FirstOrDefaultAsync(u => u.RoleId == 2);
+                    if (hrAdmin != null && manager != null)
+                    {
+                        var subject = $"Travel Request {id} Approved by Manager";
+                        var body = $"Travel request (ID: {request.RequestId}) from {request.EmployeeName} has been approved by {manager.FirstName} {manager.LastName}. Please review and take action.";
+                        await _emailService.SendEmailAsync(hrAdmin.Email, subject, body);
+                    }
                     break;
                 case "disapprove":
                     request.Status = "Disapproved";

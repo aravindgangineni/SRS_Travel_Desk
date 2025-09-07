@@ -61,7 +61,6 @@ public class TravelDeskContext : DbContext
         );
 
         // Seeding users with unique, hardcoded password hashes for each role.
-        // You MUST replace these with hashes you generated yourself.
         var adminPasswordHash = "$2a$11$BUoL58RIX6iaCyJP9epMAuRdhABqmq6Zulb/ZGNMdsE4Qm.C6J6EK";
         var hrPasswordHash = "$2a$11$EX6rqH9avLIzbfz1m4xsR.pYK1Xbye7TXoUfH0TCPSfbK8xXV9cWa";
         var employeePasswordHash = "$2a$11$Qetyh.IOVeNUgMN3PASHDO0V2Q9ZExFRLa3loe2lBBXwqBCi57A42";

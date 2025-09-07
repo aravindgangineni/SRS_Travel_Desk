@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using TravelDesk_Api.Models;
 using System.Security.Claims;
+using System.Linq;
+using System.IO;
 
 namespace TravelDesk_Api.Controllers
 {
@@ -12,10 +14,12 @@ namespace TravelDesk_Api.Controllers
     public class EmployeeController : ControllerBase
     {
         private readonly TravelDeskContext _context;
+        private readonly EmailService _emailService;
 
-        public EmployeeController(TravelDeskContext context)
+        public EmployeeController(TravelDeskContext context, EmailService emailService)
         {
             _context = context;
+            _emailService = emailService;
         }
 
         [HttpPost("create-request")]
@@ -25,16 +29,24 @@ namespace TravelDesk_Api.Controllers
             if (userIdClaim == null) return Unauthorized("User ID not found in token.");
             int userId = int.Parse(userIdClaim.Value);
 
+            var user = await _context.Users
+                                     .Include(u => u.Manager)
+                                     .FirstOrDefaultAsync(u => u.UserId == userId);
+
+            if (user == null) return NotFound("User not found.");
+
             var travelRequest = new TravelRequest
             {
                 UserId = userId,
-                EmployeeId = requestDto.EmployeeId,
+                EmployeeId = user.EmployeeId,
+                EmployeeName = user.FirstName + " " + user.LastName,
                 ProjectName = requestDto.ProjectName,
                 DepartmentName = requestDto.DepartmentName,
                 ReasonForTravelling = requestDto.ReasonForTravelling,
                 TypeOfBooking = requestDto.TypeOfBooking,
                 FlightType = requestDto.FlightType,
-                Dates = requestDto.Dates,
+                CheckinDate = requestDto.CheckinDate,
+                FlightDate = requestDto.FlightDate,
                 AadhaarNumber = requestDto.AadhaarNumber,
                 PassportNumber = requestDto.PassportNumber,
                 VisaFileUrl = requestDto.VisaFileUrl,
@@ -42,11 +54,25 @@ namespace TravelDesk_Api.Controllers
                 DaysOfStay = requestDto.DaysOfStay,
                 MealRequired = requestDto.MealRequired,
                 MealPreference = requestDto.MealPreference,
-                Status = "Pending"
+                Status = "Pending",
+                ManagerId = user.ManagerId,
+                ManagerName = user.Manager != null ? user.Manager.FirstName + " " + user.Manager.LastName : "N/A"
             };
 
             _context.TravelRequests.Add(travelRequest);
             await _context.SaveChangesAsync();
+
+            // Create a unique folder for the request
+            var requestFolderPath = Path.Combine("C:\\travel_desk_docs", travelRequest.RequestId.ToString());
+            Directory.CreateDirectory(requestFolderPath);
+
+            // Send email to the manager
+            if (user.Manager != null && !string.IsNullOrEmpty(user.Manager.Email))
+            {
+                var subject = $"New Travel Request from {user.FirstName} {user.LastName}";
+                var body = $"A new travel request (ID: {travelRequest.RequestId}) has been submitted for your approval.";
+                await _emailService.SendEmailAsync(user.Manager.Email, subject, body);
+            }
 
             return Ok(new { Message = "Request submitted successfully.", RequestId = travelRequest.RequestId });
         }
@@ -91,7 +117,8 @@ namespace TravelDesk_Api.Controllers
             requestToEdit.ReasonForTravelling = updatedRequest.ReasonForTravelling;
             requestToEdit.TypeOfBooking = updatedRequest.TypeOfBooking;
             requestToEdit.FlightType = updatedRequest.FlightType;
-            requestToEdit.Dates = updatedRequest.Dates;
+            requestToEdit.CheckinDate = updatedRequest.CheckinDate;
+            requestToEdit.FlightDate = updatedRequest.FlightDate;
             requestToEdit.AadhaarNumber = updatedRequest.AadhaarNumber;
             requestToEdit.PassportNumber = updatedRequest.PassportNumber;
             requestToEdit.VisaFileUrl = updatedRequest.VisaFileUrl;
@@ -120,7 +147,7 @@ namespace TravelDesk_Api.Controllers
                 return NotFound("Request not found or you do not have permission to delete it.");
             }
 
-            _context.TravelRequests.Remove(requestToDelete);
+            requestToDelete.IsDeleted = true;
             await _context.SaveChangesAsync();
 
             return NoContent();

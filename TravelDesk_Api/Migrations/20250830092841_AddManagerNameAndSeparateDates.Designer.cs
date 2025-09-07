@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace TravelDesk_Api.Migrations
 {
     [DbContext(typeof(TravelDeskContext))]
-    partial class TravelDeskContextModelSnapshot : ModelSnapshot
+    [Migration("20250830092841_AddManagerNameAndSeparateDates")]
+    partial class AddManagerNameAndSeparateDates
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -220,6 +223,9 @@ namespace TravelDesk_Api.Migrations
 
                     b.Property<DateTime?>("CheckinDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("Dates")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("DaysOfStay")
                         .HasColumnType("int");

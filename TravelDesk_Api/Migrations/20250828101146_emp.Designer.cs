@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace TravelDesk_Api.Migrations
 {
     [DbContext(typeof(TravelDeskContext))]
-    partial class TravelDeskContextModelSnapshot : ModelSnapshot
+    [Migration("20250828101146_emp")]
+    partial class emp
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -218,8 +221,8 @@ namespace TravelDesk_Api.Migrations
                     b.Property<string>("AadhaarNumber")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime?>("CheckinDate")
-                        .HasColumnType("datetime2");
+                    b.Property<string>("Dates")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("DaysOfStay")
                         .HasColumnType("int");
@@ -232,13 +235,6 @@ namespace TravelDesk_Api.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("EmployeeName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("FlightDate")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("FlightType")
                         .HasColumnType("nvarchar(max)");
 
@@ -247,9 +243,6 @@ namespace TravelDesk_Api.Migrations
 
                     b.Property<int?>("ManagerId")
                         .HasColumnType("int");
-
-                    b.Property<string>("ManagerName")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("MealPreference")
                         .HasColumnType("nvarchar(max)");
@@ -273,9 +266,6 @@ namespace TravelDesk_Api.Migrations
 
                     b.Property<string>("Status")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("TicketFileUrl")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("TypeOfBooking")

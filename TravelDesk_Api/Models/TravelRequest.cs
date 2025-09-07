@@ -11,6 +11,9 @@ public class TravelRequest
     public string EmployeeId { get; set; }
 
     [Required]
+    public string EmployeeName { get; set; }
+
+    [Required]
     public string ProjectName { get; set; }
 
     [Required]
@@ -24,7 +27,8 @@ public class TravelRequest
 
     public string? FlightType { get; set; }
 
-    public string? Dates { get; set; }
+    public DateTime? CheckinDate { get; set; }
+    public DateTime? FlightDate { get; set; }
 
     public string? AadhaarNumber { get; set; }
 
@@ -33,6 +37,8 @@ public class TravelRequest
     public string? VisaFileUrl { get; set; }
 
     public string? PassportFileUrl { get; set; }
+
+    public string? TicketFileUrl { get; set; }
 
     public int? DaysOfStay { get; set; }
 
@@ -50,9 +56,12 @@ public class TravelRequest
 
     public ICollection<RequestComment> Comments { get; set; }
 
-    // New fields for Manager-specific tracking
     public int? ManagerId { get; set; }
 
     [ForeignKey("ManagerId")]
     public User? Manager { get; set; }
+
+    public string? ManagerName { get; set; }
+
+    public bool IsDeleted { get; set; } = false;
 }

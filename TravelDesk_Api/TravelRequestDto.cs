@@ -19,7 +19,8 @@ public class TravelRequestDto
 
     public string? FlightType { get; set; }
 
-    public string? Dates { get; set; }
+    public DateTime? CheckinDate { get; set; }
+    public DateTime? FlightDate { get; set; }
 
     public string? AadhaarNumber { get; set; }
 

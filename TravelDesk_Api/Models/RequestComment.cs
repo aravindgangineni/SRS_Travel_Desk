@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Text.Json.Serialization; // Required for [JsonIgnore]
+using System.Text.Json.Serialization;
 using TravelDesk_Api.Models;
 
 public class RequestComment
@@ -16,12 +16,14 @@ public class RequestComment
     public int RequestId { get; set; }
 
     [ForeignKey("RequestId")]
-    [JsonIgnore] // Added to prevent circular reference
+    [JsonIgnore]
     public TravelRequest TravelRequest { get; set; }
 
     public int UserId { get; set; }
 
     [ForeignKey("UserId")]
-    [JsonIgnore] // Added to prevent circular reference
+    [JsonIgnore]
     public User User { get; set; }
+
+    public bool IsDeleted { get; set; } = false;
 }
