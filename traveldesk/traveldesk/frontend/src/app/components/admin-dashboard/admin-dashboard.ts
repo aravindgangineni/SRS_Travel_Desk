@@ -79,10 +79,10 @@ export class AdminDashboard implements OnInit {
     password: 'password123'
   };
   roleMapping: { [key: string]: number } = {
-  'Admin': 3,
-  'Travel Admin': 4, 
-  'Employee': 1,
-  'Manager': 2
+  'Admin': 1,
+  'Travel Admin': 2, 
+  'Employee': 3,
+  'Manager': 4
 };
 
   editingUser: User | null = null;
@@ -143,7 +143,7 @@ export class AdminDashboard implements OnInit {
       }
     });
   }
-
+  
   addUser() {
     if (this.isSubmitting) return;
     
